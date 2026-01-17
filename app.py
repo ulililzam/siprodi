@@ -16,132 +16,297 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================== CSS STYLING (UNU Gold Theme) ====================
-st.markdown("""
+# ==================== THEME STATE ====================
+# Initialize theme in session state
+if 'theme' not in st.session_state:
+    st.session_state.theme = 'light'
+
+# ==================== CSS STYLING (UNU Gold Theme with Dark/Light Mode) ====================
+def get_theme_css(theme='light'):
+    """Generate CSS based on current theme"""
+    
+    # Theme colors
+    if theme == 'dark':
+        colors = {
+            'main_bg': '#09090b',
+            'card_bg': '#18181b',
+            'card_text': '#fafafa',
+            'section_header': '#fafafa',
+            'label_text': '#d4d4d8',
+            'input_bg': '#27272a',
+            'input_border': '#3f3f46',
+            'radio_bg': '#27272a',
+            'radio_border': '#3f3f46',
+            'radio_text': '#fafafa',
+            'success_bg': '#422006',
+            'success_text': '#fef3c7',
+            'info_bg': '#27272a',
+            'info_border': '#71717a',
+            'conclusion_bg': 'linear-gradient(135deg, #422006 0%, #44403c 100%)',
+            'conclusion_title': '#fbbf24',
+            'conclusion_text': '#fef3c7',
+            'metric_bg': '#27272a',
+            'metric_border': '#3f3f46',
+            'metric_label': '#a1a1aa',
+            'metric_value': '#fafafa',
+            'chart_bg': '#27272a',
+            'chart_border': '#3f3f46',
+            'title_border': '#3f3f46',
+        }
+    else:  # light theme
+        colors = {
+            'main_bg': '#09090b',
+            'card_bg': 'white',
+            'card_text': '#09090b',
+            'section_header': '#18181b',
+            'label_text': '#3f3f46',
+            'input_bg': 'white',
+            'input_border': '#e4e4e7',
+            'radio_bg': '#fafafa',
+            'radio_border': '#e4e4e7',
+            'radio_text': '#000',
+            'success_bg': '#fefce8',
+            'success_text': '#713f12',
+            'info_bg': '#f4f4f5',
+            'info_border': '#71717a',
+            'conclusion_bg': 'linear-gradient(135deg, #fefce8 0%, #fffbeb 100%)',
+            'conclusion_title': '#713f12',
+            'conclusion_text': '#854d0e',
+            'metric_bg': '#fafafa',
+            'metric_border': '#e4e4e7',
+            'metric_label': '#52525b',
+            'metric_value': '#18181b',
+            'chart_bg': '#fafafa',
+            'chart_border': '#e4e4e7',
+            'title_border': '#f4f4f5',
+        }
+    
+    return f"""
 <style>
     /* Import Inter Font (UNU uses Inter) */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
     /* Global Styles */
-    * {
+    * {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
+    }}
     
     /* Main Container - Dark Background like UNU */
-    .main {
-        background: #09090b;
+    .main {{
+        background: {colors['main_bg']};
         padding: 2rem 1rem;
-    }
+        transition: background 0.3s ease;
+    }}
     
     /* Content Container */
-    .block-container {
+    .block-container {{
         max-width: 1200px;
         padding: 2rem 1rem;
-    }
+    }}
     
-    /* Card Container - Clean White with Gold Accent */
-    .card-container {
-        background: white;
+    /* Mobile Responsive */
+    @media (max-width: 768px) {{
+        .block-container {{
+            padding: 1rem 0.5rem;
+        }}
+    }}
+    
+    /* Card Container - Theme Aware */
+    .card-container {{
+        background: {colors['card_bg']};
         border-radius: 8px;
         padding: 3rem 2.5rem;
         box-shadow: 0 4px 20px rgba(191, 140, 22, 0.15);
         margin: 1rem auto;
         border-top: 4px solid #BF8C16;
-    }
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+    }}
+    
+    /* Mobile Responsive Card */
+    @media (max-width: 768px) {{
+        .card-container {{
+            padding: 1.5rem 1rem;
+            margin: 0.5rem auto;
+        }}
+    }}
     
     /* Header Title */
-    .title-container {
+    .title-container {{
         text-align: center;
         margin-bottom: 2.5rem;
         padding-bottom: 2rem;
-        border-bottom: 2px solid #f4f4f5;
-    }
+        border-bottom: 2px solid {colors['title_border']};
+    }}
     
-    .main-title {
+    /* Mobile Responsive Title */
+    @media (max-width: 768px) {{
+        .title-container {{
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+        }}
+    }}
+    
+    .main-title {{
         font-size: 2.25rem;
         font-weight: 700;
-        color: #09090b;
+        color: {colors['card_text']};
         margin: 0 0 0.75rem 0;
         letter-spacing: -0.5px;
-    }
+    }}
     
-    .subtitle {
+    /* Mobile Responsive Title */
+    @media (max-width: 768px) {{
+        .main-title {{
+            font-size: 1.5rem;
+        }}
+    }}
+    
+    .subtitle {{
         color: #71717a;
         font-size: 1rem;
         font-weight: 400;
         line-height: 1.5;
-    }
+    }}
+    
+    /* Mobile Responsive Subtitle */
+    @media (max-width: 768px) {{
+        .subtitle {{
+            font-size: 0.875rem;
+        }}
+    }}
+    
+    /* Theme Toggle Button */
+    .theme-toggle {{
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 999;
+        background: {colors['card_bg']};
+        border: 2px solid #BF8C16;
+        border-radius: 50px;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }}
+    
+    .theme-toggle:hover {{
+        background: #BF8C16;
+        transform: scale(1.05);
+    }}
     
     /* Section Headers */
-    .section-header {
+    .section-header {{
         font-size: 1.125rem;
         font-weight: 600;
-        color: #18181b;
+        color: {colors['section_header']};
         margin: 2rem 0 1.25rem 0;
         padding-left: 1rem;
         border-left: 4px solid #BF8C16;
-    }
+    }}
+    
+    /* Mobile Responsive Section Header */
+    @media (max-width: 768px) {{
+        .section-header {{
+            font-size: 1rem;
+            margin: 1.5rem 0 1rem 0;
+        }}
+    }}
     
     /* Input Labels - Clean Professional Style */
     .stSlider > label,
     .stSelectbox > label,
-    .stRadio > label {
+    .stRadio > label {{
         font-weight: 500 !important;
-        color: #3f3f46 !important;
+        color: {colors['label_text']} !important;
         font-size: 0.9rem !important;
-    }
+    }}
+    
+    /* Mobile Responsive Labels */
+    @media (max-width: 768px) {{
+        .stSlider > label,
+        .stSelectbox > label,
+        .stRadio > label {{
+            font-size: 0.85rem !important;
+        }}
+    }}
     
     /* Slider Styling - Gold Theme */
-    .stSlider > div > div > div > div {
+    .stSlider > div > div > div > div {{
         background: #BF8C16 !important;
-    }
+    }}
     
-    .stSlider > div > div > div {
+    .stSlider > div > div > div {{
         background: #e4e4e7 !important;
-    }
+    }}
     
-    /* Fix: Show min/max labels (0 and 100) */
-    .stSlider > div[data-baseweb="slider"] > div:last-child {
-        padding: 0 !important;
-        margin-top: 0.5rem !important;
-    }
+    /* HIDE slider tick labels (0 and 100) */
+    .stSlider [data-testid="stTickBar"] {{
+        display: none !important;
+    }}
     
-    .stSlider [data-testid="stTickBar"] {
-        padding-top: 0.5rem !important;
-    }
+    .stSlider > div[data-baseweb="slider"] > div:last-child {{
+        display: none !important;
+    }}
     
     /* Selectbox Styling */
-    .stSelectbox > div > div {
+    .stSelectbox > div > div {{
+        background: {colors['input_bg']} !important;
         border-radius: 6px;
-        border: 1.5px solid #e4e4e7;
+        border: 1.5px solid {colors['input_border']};
         transition: all 0.2s ease;
-    }
+    }}
     
     .stSelectbox > div > div:hover,
-    .stSelectbox > div > div:focus-within {
+    .stSelectbox > div > div:focus-within {{
         border-color: #BF8C16;
-    }
+    }}
     
-    /* Radio Button Styling */
-    .stRadio > div {
-        background: #fafafa;
+    /* Radio Button Styling - IMPROVED VISIBILITY */
+    .stRadio > div {{
+        background: {colors['radio_bg']};
         padding: 1rem;
         border-radius: 6px;
-        border: 1px solid #e4e4e7;
-    }
+        border: 1px solid {colors['radio_border']};
+    }}
     
-    .stRadio > div > label > div:first-child {
-        background-color: white !important;
-        border: 2px solid #d4d4d8 !important;
-    }
+    .stRadio > div > label {{
+        color: {colors['radio_text']} !important;
+    }}
     
-    .stRadio > div > label > div:first-child:has(input:checked) {
+    /* Radio button circle - NOT selected */
+    .stRadio > div > label > div:first-child {{
+        background-color: {colors['input_bg']} !important;
+        border: 3px solid #a1a1aa !important;
+        width: 24px !important;
+        height: 24px !important;
+    }}
+    
+    /* Radio button circle - SELECTED (Gold fill) */
+    .stRadio > div > label > div:first-child:has(input:checked) {{
         background-color: #BF8C16 !important;
         border-color: #BF8C16 !important;
-    }
+        box-shadow: 0 0 0 3px rgba(191, 140, 22, 0.2) !important;
+    }}
+    
+    /* Inner dot when selected */
+    .stRadio > div > label > div:first-child:has(input:checked)::after {{
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: white;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }}
     
     /* Button - Pill Shape with Gold Border (UNU Style) */
-    .stButton > button {
+    .stButton > button {{
         width: 100%;
         background: #09090b;
         color: white;
@@ -154,102 +319,166 @@ st.markdown("""
         transition: all 0.3s ease;
         margin-top: 2rem;
         text-transform: none;
-    }
+    }}
     
-    .stButton > button:hover {
+    .stButton > button:hover {{
         background: #BF8C16;
         border-color: #BF8C16;
         transform: translateY(-1px);
         box-shadow: 0 8px 20px rgba(191, 140, 22, 0.3);
-    }
+    }}
     
-    /* Success Box - Gold Accent */
-    .element-container:has(.stAlert) {
+    /* Mobile Responsive Button */
+    @media (max-width: 768px) {{
+        .stButton > button {{
+            padding: 0.75rem 2rem;
+            font-size: 0.95rem;
+        }}
+    }}
+    
+    /* Success Box - Theme Aware */
+    .element-container:has(.stAlert) {{
         margin: 2rem 0;
-    }
+    }}
     
-    div[data-testid="stMarkdownContainer"] > .stAlert {
-        background: #fefce8;
+    div[data-testid="stMarkdownContainer"] > .stAlert {{
+        background: {colors['success_bg']};
         border-left: 4px solid #BF8C16;
         border-radius: 6px;
         padding: 1.5rem;
-        color: #713f12;
-    }
+        color: {colors['success_text']};
+    }}
     
     /* Info Box */
-    .stAlert[data-baseweb="notification"] {
-        background: #f4f4f5;
-        border-left: 4px solid #71717a;
+    .stAlert[data-baseweb="notification"] {{
+        background: {colors['info_bg']};
+        border-left: 4px solid {colors['info_border']};
         border-radius: 6px;
-    }
+        color: {colors['label_text']};
+    }}
     
-    /* Conclusion Box - Special Styling */
-    .conclusion-box {
-        background: linear-gradient(135deg, #fefce8 0%, #fffbeb 100%);
+    /* Conclusion Box - Theme Aware */
+    .conclusion-box {{
+        background: {colors['conclusion_bg']};
         border: 2px solid #BF8C16;
         border-radius: 8px;
         padding: 2rem;
         margin: 2rem 0;
         box-shadow: 0 4px 15px rgba(191, 140, 22, 0.1);
-    }
+    }}
     
-    .conclusion-title {
+    /* Mobile Responsive Conclusion */
+    @media (max-width: 768px) {{
+        .conclusion-box {{
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }}
+    }}
+    
+    .conclusion-title {{
         font-size: 1.25rem;
         font-weight: 700;
-        color: #713f12;
+        color: {colors['conclusion_title']};
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
+    }}
     
-    .conclusion-text {
+    /* Mobile Responsive Conclusion Title */
+    @media (max-width: 768px) {{
+        .conclusion-title {{
+            font-size: 1.1rem;
+        }}
+    }}
+    
+    .conclusion-text {{
         font-size: 1rem;
         line-height: 1.75;
-        color: #854d0e;
-    }
+        color: {colors['conclusion_text']};
+    }}
     
-    /* Metrics Styling */
-    .stMetric {
-        background: #fafafa;
+    /* Mobile Responsive Conclusion Text */
+    @media (max-width: 768px) {{
+        .conclusion-text {{
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }}
+    }}
+    
+    /* Metrics Styling - Theme Aware */
+    .stMetric {{
+        background: {colors['metric_bg']};
         padding: 1rem;
         border-radius: 6px;
-        border: 1px solid #e4e4e7;
-    }
+        border: 1px solid {colors['metric_border']};
+    }}
     
-    .stMetric label {
-        color: #52525b !important;
+    .stMetric label {{
+        color: {colors['metric_label']} !important;
         font-weight: 500 !important;
-    }
+    }}
     
-    .stMetric [data-testid="stMetricValue"] {
-        color: #18181b !important;
+    .stMetric [data-testid="stMetricValue"] {{
+        color: {colors['metric_value']} !important;
         font-size: 1.125rem !important;
-    }
+    }}
+    
+    /* Mobile Responsive Metrics */
+    @media (max-width: 768px) {{
+        .stMetric {{
+            padding: 0.75rem;
+        }}
+        
+        .stMetric [data-testid="stMetricValue"] {{
+            font-size: 1rem !important;
+        }}
+    }}
     
     /* Remove Streamlit Branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
     
     /* Smooth Animations */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn {{
+        from {{ opacity: 0; transform: translateY(10px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
+    }}
     
-    .card-container {
+    .card-container {{
         animation: fadeIn 0.5s ease-out;
-    }
+    }}
     
-    /* Chart Styling */
-    .stBarChart {
-        background: #fafafa;
+    /* Chart Styling - Theme Aware */
+    .stBarChart {{
+        background: {colors['chart_bg']};
         padding: 1.5rem;
         border-radius: 6px;
-        border: 1px solid #e4e4e7;
-    }
+        border: 1px solid {colors['chart_border']};
+    }}
+    
+    /* Mobile Responsive Chart */
+    @media (max-width: 768px) {{
+        .stBarChart {{
+            padding: 1rem;
+        }}
+    }}
+    
+    /* Column Responsive */
+    @media (max-width: 768px) {{
+        .row-widget.stHorizontal {{
+            flex-direction: column !important;
+        }}
+        
+        .row-widget.stHorizontal > div {{
+            width: 100% !important;
+        }}
+    }}
 </style>
-""", unsafe_allow_html=True)
+"""
+
+# Apply theme CSS
+st.markdown(get_theme_css(st.session_state.theme), unsafe_allow_html=True)
 
 # ==================== LOAD MODEL ====================
 @st.cache_resource
@@ -301,7 +530,7 @@ def generate_conclusion(input_data, predicted_prodi, confidence):
     conclusion_parts = []
     
     # Introduction - more casual tone
-    conclusion_parts.append(f"Setelah menganalisis profil akademik dan minat kamu, sistem merekomendasikan **{predicted_prodi}** sebagai pilihan yang paling sesuai dengan karakteristik kamu.")
+    conclusion_parts.append(f"Setelah menganalisis profil akademik dan minat kamu, sistem merekomendasikan *{predicted_prodi}* sebagai pilihan yang paling sesuai dengan karakteristik kamu.")
     
     # Academic strengths
     academic_strengths = []
@@ -356,6 +585,17 @@ st.markdown("""
         <p class="subtitle">Universitas Nahdlatul Ulama Yogyakarta<br>Machine Learning Recommendation System</p>
     </div>
 """, unsafe_allow_html=True)
+
+# ==================== THEME TOGGLE ====================
+col_theme1, col_theme2, col_theme3 = st.columns([4, 1, 1])
+with col_theme3:
+    theme_icon = "🌙" if st.session_state.theme == 'light' else "☀️"
+    theme_label = "Dark" if st.session_state.theme == 'light' else "Light"
+    
+    if st.button(f"{theme_icon} {theme_label}", key="theme_toggle", use_container_width=True):
+        # Toggle theme
+        st.session_state.theme = 'dark' if st.session_state.theme == 'light' else 'light'
+        st.rerun()
 
 # ==================== FORM INPUT ====================
 st.markdown('<p class="section-header">Data Nilai Akademik</p>', unsafe_allow_html=True)
