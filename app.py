@@ -25,60 +25,62 @@ if 'theme' not in st.session_state:
 def get_theme_css(theme='light'):
     """Generate CSS based on current theme"""
     
-    # Theme colors
+    # Theme colors - IMPROVED for better visibility
     if theme == 'dark':
         colors = {
-            'main_bg': '#09090b',
-            'card_bg': '#18181b',
-            'card_text': '#fafafa',
+            'main_bg': '#0a0a0a',  # Darker for more contrast
+            'card_bg': '#1a1a1a',  # Slightly lighter than main
+            'card_text': '#ffffff',  # Pure white for readability
             'section_header': '#fafafa',
-            'label_text': '#d4d4d8',
-            'input_bg': '#27272a',
-            'input_border': '#3f3f46',
-            'radio_bg': '#27272a',
-            'radio_border': '#3f3f46',
-            'radio_text': '#fafafa',
-            'success_bg': '#422006',
+            'label_text': '#e4e4e7',  # Brighter labels
+            'input_bg': '#2a2a2a',  # Darker inputs
+            'input_border': '#404040',
+            'radio_bg': '#2a2a2a',
+            'radio_border': '#404040',
+            'radio_text': '#ffffff',
+            'success_bg': '#1a1507',  # Very dark brown
             'success_text': '#fef3c7',
-            'info_bg': '#27272a',
-            'info_border': '#71717a',
-            'conclusion_bg': 'linear-gradient(135deg, #422006 0%, #44403c 100%)',
+            'info_bg': '#2a2a2a',
+            'info_text': '#e4e4e7',
+            'info_border': '#404040',
+            'conclusion_bg': 'linear-gradient(135deg, #2a1f0a 0%, #1a1507 100%)',
             'conclusion_title': '#fbbf24',
             'conclusion_text': '#fef3c7',
-            'metric_bg': '#27272a',
-            'metric_border': '#3f3f46',
+            'metric_bg': '#2a2a2a',
+            'metric_border': '#404040',
             'metric_label': '#a1a1aa',
-            'metric_value': '#fafafa',
-            'chart_bg': '#27272a',
-            'chart_border': '#3f3f46',
-            'title_border': '#3f3f46',
+            'metric_value': '#ffffff',
+            'chart_bg': '#2a2a2a',
+            'chart_border': '#404040',
+            'title_border': '#404040',
         }
     else:  # light theme
         colors = {
             'main_bg': '#09090b',
-            'card_bg': 'white',
+            'card_bg': '#ffffff',
             'card_text': '#09090b',
             'section_header': '#18181b',
             'label_text': '#3f3f46',
-            'input_bg': 'white',
+            'input_bg': '#ffffff',
             'input_border': '#e4e4e7',
-            'radio_bg': '#fafafa',
-            'radio_border': '#e4e4e7',
-            'radio_text': '#000',
+            'radio_bg': '#f9fafb',
+            'radio_border': '#d1d5db',  
+            'radio_text': '#111827',
             'success_bg': '#fefce8',
             'success_text': '#713f12',
             'info_bg': '#f4f4f5',
+            'info_text': '#52525b',
             'info_border': '#71717a',
             'conclusion_bg': 'linear-gradient(135deg, #fefce8 0%, #fffbeb 100%)',
             'conclusion_title': '#713f12',
             'conclusion_text': '#854d0e',
-            'metric_bg': '#fafafa',
-            'metric_border': '#e4e4e7',
-            'metric_label': '#52525b',
-            'metric_value': '#18181b',
-            'chart_bg': '#fafafa',
-            'chart_border': '#e4e4e7',
-            'title_border': '#f4f4f5',
+            'metric_bg': '#f9fafb',
+            'metric_border': '#e5e7eb',
+            'metric_label': '#6b7280',
+            'metric_value': '#111827',
+            'chart_bg': '#f9fafb',
+            'chart_border': '#e5e7eb',
+            'title_border': '#e5e7eb',
         }
     
     return f"""
@@ -138,8 +140,48 @@ def get_theme_css(theme='light'):
         border-bottom: 2px solid {colors['title_border']};
     }}
     
-    /* Mobile Responsive Title */
+    /* Header Wrapper for Title + Theme Button */
+    .header-wrapper {{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid {colors['title_border']};
+    }}
+    
+    .header-content {{
+        flex: 1;
+        text-align: center;
+    }}
+    
+    .theme-toggle-btn {{
+        background: #BF8C16;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }}
+    
+    .theme-toggle-btn:hover {{
+        background: #a67614;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(191, 140, 22, 0.3);
+    }}
+    
+    /* Mobile Responsive Header */
     @media (max-width: 768px) {{
+        .header-wrapper {{
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }}
+        
         .title-container {{
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
@@ -265,44 +307,33 @@ def get_theme_css(theme='light'):
         border-color: #BF8C16;
     }}
     
-    /* Radio Button Styling - IMPROVED VISIBILITY */
+    /* Radio Button Styling - MAXIMUM VISIBILITY */
     .stRadio > div {{
         background: {colors['radio_bg']};
-        padding: 1rem;
-        border-radius: 6px;
-        border: 1px solid {colors['radio_border']};
+        padding: 1.25rem;
+        border-radius: 8px;
+        border: 2px solid {colors['radio_border']};
     }}
     
     .stRadio > div > label {{
         color: {colors['radio_text']} !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
     }}
     
-    /* Radio button circle - NOT selected */
+    /* Radio button circle - UNSELECTED */
     .stRadio > div > label > div:first-child {{
         background-color: {colors['input_bg']} !important;
-        border: 3px solid #a1a1aa !important;
-        width: 24px !important;
-        height: 24px !important;
+        border: 4px solid #9ca3af !important;
+        width: 28px !important;
+        height: 28px !important;
     }}
     
-    /* Radio button circle - SELECTED (Gold fill) */
+    /* Radio button circle - SELECTED (SOLID GOLD - Super visible!) */
     .stRadio > div > label > div:first-child:has(input:checked) {{
         background-color: #BF8C16 !important;
-        border-color: #BF8C16 !important;
-        box-shadow: 0 0 0 3px rgba(191, 140, 22, 0.2) !important;
-    }}
-    
-    /* Inner dot when selected */
-    .stRadio > div > label > div:first-child:has(input:checked)::after {{
-        content: '';
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        background: white;
-        border-radius: 50%;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        border: 4px solid #BF8C16 !important;
+        box-shadow: 0 0 0 4px rgba(191, 140, 22, 0.15) !important;
     }}
     
     /* Button - Pill Shape with Gold Border (UNU Style) */
@@ -354,7 +385,7 @@ def get_theme_css(theme='light'):
         background: {colors['info_bg']};
         border-left: 4px solid {colors['info_border']};
         border-radius: 6px;
-        color: {colors['label_text']};
+        color: {colors['info_text']};
     }}
     
     /* Conclusion Box - Theme Aware */
@@ -577,23 +608,22 @@ def generate_conclusion(input_data, predicted_prodi, confidence):
     
     return ' '.join(conclusion_parts)
 
-# ==================== HEADER ====================
+# ==================== HEADER WITH THEME TOGGLE ====================
 st.markdown("""
 <div class="card-container">
-    <div class="title-container">
-        <h1 class="main-title">Sistem Prediksi Program Studi</h1>
-        <p class="subtitle">Universitas Nahdlatul Ulama Yogyakarta<br>Machine Learning Recommendation System</p>
+    <div class="header-wrapper">
+        <div class="header-content">
+            <h1 class="main-title">Sistem Prediksi Program Studi</h1>
+            <p class="subtitle">Universitas Nahdlatul Ulama Yogyakarta<br>Machine Learning Recommendation System</p>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
-# ==================== THEME TOGGLE ====================
-col_theme1, col_theme2, col_theme3 = st.columns([4, 1, 1])
-with col_theme3:
-    theme_icon = "🌙" if st.session_state.theme == 'light' else "☀️"
+# Theme toggle button (must be outside markdown but styling makes it look inside)
+col_left, col_right = st.columns([5, 1])
+with col_right:
     theme_label = "Dark" if st.session_state.theme == 'light' else "Light"
-    
-    if st.button(f"{theme_icon} {theme_label}", key="theme_toggle", use_container_width=True):
-        # Toggle theme
+    if st.button(theme_label, key="theme_toggle", help="Toggle dark/light theme"):
         st.session_state.theme = 'dark' if st.session_state.theme == 'light' else 'light'
         st.rerun()
 
